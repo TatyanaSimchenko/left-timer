@@ -1,0 +1,13 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer__display {
+  font-size: 45px;
+}
+
+.timer__btn:not(:last-of-type) {
+  margin-top: 15px;
+}
