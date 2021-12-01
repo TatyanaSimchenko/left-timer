@@ -1,61 +1,48 @@
 import React, { useState, useEffect } from "react";
 import PauseButton from "../PauseButton/PauseButton";
 import PlayButton from "../PlayButton/PlayButton";
-import "./timer.css";
-function Timer() {
-  const [minutes, setMinutes] = useState(1);
-  const [seconds, setSeconds] = useState(0);
-  const [displayMessage, setDisplayMessage] = useState(false);
-  const [status, setStatus] = useState("working");
+import "./Timer.css";
+
+function Timer(props) {
+  const { start, step } = props;
+  const [time, setTime] = useState(start);
+  const [play, setPlay] = useState(true);
+  const timeFormat =
+    ("0" + Math.floor((time / 60000) % 60)).slice(-2) +
+    ":" +
+    ("0" + Math.floor((time / 1000) % 60)).slice(-2);
 
   useEffect(() => {
-    let secondTimerId;
-    if (status === "working") {
-      secondTimerId = setInterval(() => {
-        if (seconds === 0) {
-          if (minutes !== 0) {
-            setSeconds(59);
-            setMinutes(minutes - 1);
+    let interval = null;
+    let stepInProgress = 1000;
+    if (play) {
+      interval = setInterval(() => {
+        setTime((prevTime) => {
+          if (prevTime > 0) {
+            return prevTime - stepInProgress * step;
           } else {
-            let minutes = displayMessage ? 1 : 0;
-            let seconds = 59;
-            setMinutes(minutes);
-            setSeconds(seconds);
-            setDisplayMessage(!displayMessage);
+            setPlay(false);
+            return (prevTime = start);
           }
-        } else {
-          setSeconds(seconds - 1);
-        }
+        });
       }, 1000);
+    } else {
+      clearInterval(interval);
     }
+    return () => clearInterval(interval);
+  }, [play, start, step]);
 
-    return () => {
-      clearInterval(secondTimerId);
-    };
-  }, [minutes, seconds, status]);
-
-  const stopTimer = () => {
-    setStatus("paused");
-  };
-  const playTimer = () => {
-    setStatus("working");
-  };
-  const timerMinutes = minutes < 10 ? `0${minutes}` : minutes;
-  const timerSeconds = seconds < 10 ? `0${seconds}` : seconds;
   return (
     <div className="timer">
-      <div className="timer__display">
-        {timerMinutes}:{timerSeconds}
-      </div>
-
+      <div className="timer__display">{timeFormat}</div>
       <div className="timer__btn">
-        <PlayButton onClick={playTimer} />
+        <PlayButton onClick={() => setPlay(true)} />
       </div>
       <div className="timer__btn">
-        <PauseButton onClick={stopTimer} />
+        <button onClick={() => setTime(start)}>Reset</button>
       </div>
-      <div className="timer__message">
-        {displayMessage && <div>Break time!</div>}
+      <div className="timer__btn">
+        <PauseButton onClick={() => setPlay(false)} />
       </div>
     </div>
   );
