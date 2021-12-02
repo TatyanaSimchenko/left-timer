@@ -3,8 +3,7 @@ import PauseButton from "../PauseButton/PauseButton";
 import PlayButton from "../PlayButton/PlayButton";
 import "./Timer.css";
 
-function Timer(props) {
-  const { start, step } = props;
+function Timer({ start, step }) {
   const [time, setTime] = useState(start);
   const [play, setPlay] = useState(true);
   const timeFormat =
